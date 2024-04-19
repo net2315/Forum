@@ -1,8 +1,9 @@
-package Core
+package server
 
 import (
 	"fmt"
 	"net/http"
+	"text/template"
 )
 
 const port = ":3000"
@@ -16,7 +17,7 @@ func HandleFunc() {
 }
 
 func Home(w http.ResponseWriter, r *http.Request) { //affiche la page du menu principal
-	renderTemplate(w, "src/html/menu_principal")
+	renderTemplate(w, "index")
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string) { //Parse le fichier html et envoi les informations au client
