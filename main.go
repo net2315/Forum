@@ -1,1 +1,5 @@
 package Forum
+
+func main() {
+
+}
