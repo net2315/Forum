@@ -1,3 +1,7 @@
+body {
+    background-color: aqua;
+}
+
 .menu {
     position: absolute;
     top: 0;

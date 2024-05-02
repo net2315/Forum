@@ -12,12 +12,17 @@ func HandleFunc() {
 
 	http.HandleFunc("/", Home)
 
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./assets/css/"))))
+
 	fmt.Println("http://localhost:3000 - Server started on port :3000")
-	http.ListenAndServe(port, nil)
+	err := http.ListenAndServe(port, nil)
+	if err != nil {
+		return
+	}
 }
 
 func Home(w http.ResponseWriter, r *http.Request) { //affiche la page du menu principal
-	renderTemplate(w, "index")
+	renderTemplate(w, "assets/html/Accueil")
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string) { //Parse le fichier html et envoi les informations au client
