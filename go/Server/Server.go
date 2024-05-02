@@ -12,6 +12,7 @@ func HandleFunc() {
 
 	http.HandleFunc("/", Home)
 
+	http.Handle("/media/", http.StripPrefix("/media/", http.FileServer(http.Dir("./media"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./assets/css/"))))
 
 	fmt.Println("http://localhost:3000 - Server started on port :3000")

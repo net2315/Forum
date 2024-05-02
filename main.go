@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Forum/Server"
+	"Forum/go/Server"
 )
 
 func main() {
