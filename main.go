@@ -1,9 +1,10 @@
 package main
 
 import (
-	"Forum/go/Server"
+    "Forum/go/Server" 
 )
 
 func main() {
-	server.HandleFunc()
+	server.InitDB("./db/database.db")
+    server.HandleFunc()
 }
