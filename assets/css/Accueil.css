@@ -45,6 +45,15 @@ button {
     margin: 8px;
 }
 
+a > button {
+    font-size: large;
+    background-color: rgb(48, 173, 16);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 8px;
+}
+
 .pageTitle {
     font-size: 50px;
     color: rgb(48, 173, 16);
