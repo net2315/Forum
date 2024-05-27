@@ -2,10 +2,13 @@ package server
 
 import (
 	"Forum/go/database"
+	"Forum/go/mag"
 	"fmt"
 	"net/http"
 	"text/template"
 )
+
+var data mag.Categorie
 
 const port = ":3000"
 
@@ -34,22 +37,22 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("ID: %d, Nom: %s, Description: %s\n", category.ID, category.Nom, category.Description)
 	}
 
-	renderTemplate(w, "assets/html/Accueil", nil)
+	renderTemplate(w, "assets/html/Accueil")
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "assets/html/login", nil)
+	renderTemplate(w, "assets/html/login")
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "assets/html/register", nil)
+	renderTemplate(w, "assets/html/register")
 }
 
-func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
+func renderTemplate(w http.ResponseWriter, tmpl string) {
 	t, err := template.ParseFiles("./" + tmpl + ".html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	t.Execute(w, data)
+	t.Execute(w, nil)
 }
