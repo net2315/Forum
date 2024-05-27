@@ -37,15 +37,14 @@ func HandleFunc() {
 }
 
 func GetCategories() ([]mag.Categorie, error) {
-	// Open the SQLite database (replace with your database file)
+	//Open database
 	db, err := sql.Open("sqlite3", "./db/database.db")
 	if err != nil {
 		return nil, err
 	}
 	defer db.Close()
 
-	// Query to select ID, Nom and Description from categorie
-	rows, err := db.Query("SELECT id, nom, description FROM categorie")
+	rows, err := db.Query("SELECT id, nom FROM categorie")
 	if err != nil {
 		return nil, err
 	}
@@ -54,21 +53,21 @@ func GetCategories() ([]mag.Categorie, error) {
 	var categories []mag.Categorie
 	for rows.Next() {
 		var category mag.Categorie
-		if err := rows.Scan(&category.ID, &category.Nom, &category.Description); err != nil {
+		if err := rows.Scan(&category.ID, &category.Nom); err != nil {
 			return nil, err
 		}
 		categories = append(categories, category)
 	}
 
-	// Check for errors after iterating over rows
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	data = categories
+	data = categories 
 
 	return categories, nil
 }
+
 
 func categoriesHandler(w http.ResponseWriter, r *http.Request) {
 	categories, err := GetCategories()
@@ -79,9 +78,11 @@ func categoriesHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	for _, category := range categories {
-		fmt.Fprintf(w, "ID: %d\nNom: %s\nDescription: %s\n\n", category.ID, category.Nom, category.Description)
+		fmt.Fprintf(w, "ID: %d\nNom: %s\n\n", category.ID, category.Nom)
 	}
 }
+
+
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	categories, err := GetCategories()
