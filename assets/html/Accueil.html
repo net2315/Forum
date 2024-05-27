@@ -2,7 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" type="text/css" href="../css/Accueil.css">
     <link rel="shortcut icon" href="../../media/téléchargement.jpeg" type="image/x-icon">
@@ -14,20 +15,24 @@
         <div></div>
         <h1 class="pageTitle">Gastroglobe</h1>
         <div class="user">
-            <a href="./register"><button>Register</button></a>
-            <a href="./login"><button>Login</button></a>
+            <a href="./register">
+                <button>Register</button>
+            </a>
+            <a href="./login">
+                <button>Login</button>
+            </a>
         </div>
     </div>
-    <div>
-        <p>Catégories :</p>
-        <ul>
-            {{range .}}
-            <li>{{.Nom}}</li>
-            {{end}}
-        </ul>
-    </div>
+
     <div class="ButtonContainer">
         <button id="categorieGastroButton">Categorie</button>
+        <div class="allbutton">
+
+            {{range .}}
+            <button class="bouton">{{.Nom}}</button>
+            {{end}}
+
+        </div>
         <button id="messagesCreesButton">Messages Créés</button>
         <button id="messagesAimesButton">Messages Aimés</button>
     </div>
