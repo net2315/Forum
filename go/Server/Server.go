@@ -14,27 +14,6 @@ var data []mag.Categorie
 
 const port = ":3000"
 
-// func HandleFunc() {
-// 	// Initialize data when server starts
-// 	_, err := GetCategories()
-// 	if err != nil {
-// 		fmt.Println("Error initializing categories:", err)
-// 		return
-// 	}
-
-// 	http.HandleFunc("/", Home)
-// 	http.HandleFunc("/login", Login)
-// 	http.HandleFunc("/register", Register)
-// 	http.HandleFunc("/categories", categoriesHandler)
-// 	http.Handle("/media/", http.StripPrefix("/media/", http.FileServer(http.Dir("./media"))))
-// 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./assets/css/"))))
-
-// 	fmt.Println("http://localhost:3000 - Server started on port :3000")
-// 	err = http.ListenAndServe(port, nil)
-// 	if err != nil {
-// 		return
-// 	}
-// }
 func HandleFunc() {
 	// Initialiser les données au démarrage du serveur
 	_, err := GetCategories()
