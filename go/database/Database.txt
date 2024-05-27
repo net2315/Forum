@@ -22,19 +22,26 @@ func InitDB(filepath string) {
 }
 
 func GetCategories() ([]mag.Categorie, error) {
-	rows, err := db.Query("SELECT id, nom, description FROM categorie")
+	rows, err := db.Query("SELECT description FROM categorie")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var categories []mag.Categorie
+	var data1 []mag.Categorie
 	for rows.Next() {
-		var category mag.Categorie
-		if err := rows.Scan(&category.ID, &category.Nom, &category.Description); err != nil {
+		var description string
+		if err := rows.Scan(&description); err != nil {
 			return nil, err
 		}
-		categories = append(categories, category)
+		category := mag.Categorie{Description: description}
+		data1 = append(data1, category)
 	}
-	return categories, nil
+
+	// Check for errors after iterating over rows
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return data1, nil
 }

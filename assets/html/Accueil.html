@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" type="text/css" href="../css/Accueil.css">
     <link rel="shortcut icon" href="../../media/téléchargement.jpeg" type="image/x-icon">
-    <title>HomePage</title>
+    <title>Gastroglobe</title>
 </head>
 <body>
 <div class="navbar">
@@ -19,7 +19,13 @@
             <a href="./login"><button>Login</button></a>
         </div>
     </div>
-    <div><p>categorie : {{.Description}}</p>
+    <div>
+        <p>Catégories :</p>
+        <ul>
+            {{range .}}
+            <li>{{.Description}}</li>
+            {{end}}
+        </ul>
     </div>
     <div class="ButtonContainer">
         <button id="categorieGastroButton">Categorie</button>
@@ -27,49 +33,5 @@
         <button id="messagesAimesButton">Messages Aimés</button>
     </div>
 </div>
-<h1>
-    Hoc inmaturo interitu ipse quoque sui pertaesus excessit e vita aetatis nono anno atque vicensimo cum quadriennio
-    imperasset. natus apud Tuscos in Massa Veternensi, patre Constantio Constantini fratre imperatoris, matreque Galla
-    sorore Rufini et Cerealis, quos trabeae consulares nobilitarunt et praefecturae.
-    Ut enim quisque sibi plurimum confidit et ut quisque maxime virtute et sapientia sic munitus est, ut nullo egeat
-    suaque omnia in se ipso posita iudicet, ita in amicitiis expetendis colendisque maxime excellit. Quid enim?
-    Africanus indigens mei? Minime hercule! ac ne ego quidem illius; sed ego admiratione quadam virtutis eius, ille
-    vicissim opinione fortasse non nulla, quam de meis moribus habebat, me dilexit; auxit benevolentiam consuetudo. Sed
-    quamquam utilitates multae et magnae consecutae sunt, non sunt tamen ab earum spe causae diligendi profectae.
-    Thalassius vero ea tempestate praefectus praetorio praesens ipse quoque adrogantis ingenii, considerans incitationem
-    eius ad multorum augeri discrimina, non maturitate vel consiliis mitigabat, ut aliquotiens celsae potestates iras
-    principum molliverunt, sed adversando iurgandoque cum parum congrueret, eum ad rabiem potius evibrabat, Augustum
-    actus eius exaggerando creberrime docens, idque, incertum qua mente, ne lateret adfectans. quibus mox Caesar acrius
-    efferatus, velut contumaciae quoddam vexillum altius erigens, sine respectu salutis alienae vel suae ad vertenda
-    opposita instar rapidi fluminis irrevocabili impetu ferebatur.
-    Et quoniam inedia gravi adflictabantur, locum petivere Paleas nomine, vergentem in mare, valido muro firmatum, ubi
-    conduntur nunc usque commeatus distribui militibus omne latus Isauriae defendentibus adsueti. circumstetere igitur
-    hoc munimentum per triduum et trinoctium et cum neque adclivitas ipsa sine discrimine adiri letali, nec cuniculis
-    quicquam geri posset, nec procederet ullum obsidionale commentum, maesti excedunt postrema vi subigente maiora
-    viribus adgressuri.
-    Siquis enim militarium vel honoratorum aut nobilis inter suos rumore tenus esset insimulatus fovisse partes
-    hostiles, iniecto onere catenarum in modum beluae trahebatur et inimico urgente vel nullo, quasi sufficiente hoc
-    solo, quod nominatus esset aut delatus aut postulatus, capite vel multatione bonorum aut insulari solitudine
-    damnabatur.
-    Nemo quaeso miretur, si post exsudatos labores itinerum longos congestosque adfatim commeatus fiducia vestri
-    ductante barbaricos pagos adventans velut mutato repente consilio ad placidiora deverti.
-    Quo cognito Constantius ultra mortalem modum exarsit ac nequo casu idem Gallus de futuris incertus agitare quaedam
-    conducentia saluti suae per itinera conaretur, remoti sunt omnes de industria milites agentes in civitatibus
-    perviis.
-    Cum haec taliaque sollicitas eius aures everberarent expositas semper eius modi rumoribus et patentes, varia animo
-    tum miscente consilia, tandem id ut optimum factu elegit: et Vrsicinum primum ad se venire summo cum honore mandavit
-    ea specie ut pro rerum tunc urgentium captu disponeretur concordi consilio, quibus virium incrementis Parthicarum
-    gentium a arma minantium impetus frangerentur.
-    Sed fruatur sane hoc solacio atque hanc insignem ignominiam, quoniam uni praeter se inusta sit, putet esse leviorem,
-    dum modo, cuius exemplo se consolatur, eius exitum expectet, praesertim cum in Albucio nec Pisonis libidines nec
-    audacia Gabini fuerit ac tamen hac una plaga conciderit, ignominia senatus.
-    Verum ad istam omnem orationem brevis est defensio. Nam quoad aetas M. Caeli dare potuit isti suspicioni locum, fuit
-    primum ipsius pudore, deinde etiam patris diligentia disciplinaque munita. Qui ut huic virilem togam deditšnihil
-    dicam hoc loco de me; tantum sit, quantum vos existimatis; hoc dicam, hunc a patre continuo ad me esse deductum;
-    nemo hunc M. Caelium in illo aetatis flore vidit nisi aut cum patre aut mecum aut in M. Crassi castissima domo, cum
-    artibus honestissimis erudiretur.
-
-</h1>
-
 </body>
 </html>
