@@ -27,11 +27,18 @@
     <div class="ButtonContainer">
         <button id="categorieGastroButton">Categorie</button>
         <div class="allbutton">
-
             {{range .}}
-            <button class="bouton">{{.Nom}}</button>
-            {{end}}
+            <article class="feature1">
+                <input type="checkbox" id="feature1"/>
+                <div>
 
+                <span>
+            {{.Nom}}
+          </span>
+
+                </div>
+                {{end}}
+            </article>
         </div>
         <button id="messagesCreesButton">Messages Créés</button>
         <button id="messagesAimesButton">Messages Aimés</button>
