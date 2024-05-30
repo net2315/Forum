@@ -28,10 +28,15 @@
         <button id="categorieGastroButton">Categorie</button>
         <div class="allbutton">
 
-            {{range .}}
+            <!-- {{range .}}
             <button class="bouton">{{.Nom}}</button>
+            {{end}} -->
+            {{range .}}
+            <a href="/posts?id={{.ID}}">
+                <button class="bouton">{{.Nom}}</button>
+            </a>
             {{end}}
-
+    
         </div>
         <button id="messagesCreesButton">Messages Créés</button>
         <button id="messagesAimesButton">Messages Aimés</button>
