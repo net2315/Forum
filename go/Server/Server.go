@@ -3,11 +3,11 @@ package server
 import (
 	"Forum/go/mag"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"text/template"
-	"encoding/base64"
-	"golang.org/x/crypto/bcrypt"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -15,7 +15,6 @@ import (
 var data []mag.Categorie
 
 const port = ":3000"
-
 
 func HandleFunc() {
 	// Initialiser les données au démarrage du serveur
@@ -31,7 +30,7 @@ func HandleFunc() {
 	http.HandleFunc("/categories", categoriesHandler)
 	http.HandleFunc("/addCategory", AddCategory)
 	http.HandleFunc("/categories-page", categoriesPageHandler)
-	http.HandleFunc("/posts", postsHandler) 
+	http.HandleFunc("/posts", postsHandler)
 	http.Handle("/media/", http.StripPrefix("/media/", http.FileServer(http.Dir("./media"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./assets/css/"))))
 
@@ -69,24 +68,24 @@ func GetCategories() ([]mag.Categorie, error) {
 		return nil, err
 	}
 
-	data = categories 
+	data = categories
 
 	return categories, nil
 }
 
 func categoriesHandler(w http.ResponseWriter, r *http.Request) {
-    categories, err := GetCategories()
-    if err != nil {
-        http.Error(w, "Error retrieving categories", http.StatusInternalServerError)
-        return
-    }
+	categories, err := GetCategories()
+	if err != nil {
+		http.Error(w, "Error retrieving categories", http.StatusInternalServerError)
+		return
+	}
 
-    w.Header().Set("Content-Type", "text/html")
-    fmt.Fprintf(w, "<html><body>")
-    for _, category := range categories {
-        fmt.Fprintf(w, `<p><a href="/posts?id=%d">%s</a></p>`, category.ID, category.Nom)
-    }
-    fmt.Fprintf(w, "</body></html>")
+	w.Header().Set("Content-Type", "text/html")
+	fmt.Fprintf(w, "<html><body>")
+	for _, category := range categories {
+		fmt.Fprintf(w, `<p><a href="/posts?id=%d">%s</a></p>`, category.ID, category.Nom)
+	}
+	fmt.Fprintf(w, "</body></html>")
 }
 
 func postsHandler(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +123,6 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 
 	renderTemplate(w, "assets/html/Posts", data)
 }
-
 
 func GetCategoryByID(categoryID string) (mag.Categorie, error) {
 	db, err := sql.Open("sqlite3", "./db/database.db")
@@ -171,15 +169,14 @@ func GetPostsByCategory(categoryID string) ([]mag.Post, error) {
 	return posts, nil
 }
 
-
 func categoriesPageHandler(w http.ResponseWriter, r *http.Request) {
-    categories, err := GetCategories()
-    if err != nil {
-        http.Error(w, "Erreur lors de la récupération des catégories", http.StatusInternalServerError)
-        return
-    }
+	categories, err := GetCategories()
+	if err != nil {
+		http.Error(w, "Erreur lors de la récupération des catégories", http.StatusInternalServerError)
+		return
+	}
 
-    renderTemplate(w, "assets/html/Categories", categories)
+	renderTemplate(w, "assets/html/Categories", categories)
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -191,7 +188,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	renderTemplate(w, "assets/html/Accueil", categories)
 }
-
 
 func InsertCategory(nom string) error {
 	db, err := sql.Open("sqlite3", "./db/database.db")
@@ -223,54 +219,54 @@ func AddCategory(w http.ResponseWriter, r *http.Request) {
 }
 
 func AuthenticateUser(mail, password string) (mag.User, error) {
-    db, err := sql.Open("sqlite3", "./db/database.db")
-    if err != nil {
-        return mag.User{}, err
-    }
-    defer db.Close()
+	db, err := sql.Open("sqlite3", "./db/database.db")
+	if err != nil {
+		return mag.User{}, err
+	}
+	defer db.Close()
 
-    var user mag.User
-    err = db.QueryRow("SELECT ID, Pseudo, Mail, MotDePasse, IDPost, IDCommentaire FROM Users WHERE Mail = ?", mail).Scan(&user.ID, &user.Pseudo, &user.Mail, &user.MotDePasse, &user.IDPost, &user.IDCommentaire)
-    if err != nil {
-        return mag.User{}, fmt.Errorf("utilisateur non trouvé")
-    }
+	var user mag.User
+	err = db.QueryRow("SELECT ID, Pseudo, Mail, MotDePasse, IDPost, IDCommentaire FROM Users WHERE Mail = ?", mail).Scan(&user.ID, &user.Pseudo, &user.Mail, &user.MotDePasse, &user.IDPost, &user.IDCommentaire)
+	if err != nil {
+		return mag.User{}, fmt.Errorf("utilisateur non trouvé")
+	}
 
-    // Compare the stored hashed password with the provided password
-    err = bcrypt.CompareHashAndPassword([]byte(user.MotDePasse), []byte(password))
-    if err != nil {
-        return mag.User{}, fmt.Errorf("mot de passe incorrect")
-    }
+	// Compare the stored hashed password with the provided password
+	err = bcrypt.CompareHashAndPassword([]byte(user.MotDePasse), []byte(password))
+	if err != nil {
+		return mag.User{}, fmt.Errorf("mot de passe incorrect")
+	}
 
-    return user, nil
+	return user, nil
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-    if r.Method == "POST" {
-        mail := r.FormValue("mail")
-        password := r.FormValue("password")
+	if r.Method == "POST" {
+		mail := r.FormValue("mail")
+		password := r.FormValue("password")
 
-        user, err := AuthenticateUser(mail, password)
-        if err != nil {
-            http.Error(w, "Identifiants invalides", http.StatusUnauthorized)
-            return
-        }
+		user, err := AuthenticateUser(mail, password)
+		if err != nil {
+			http.Error(w, "Identifiants invalides", http.StatusUnauthorized)
+			return
+		}
 
-        // Set a session cookie or token here if needed
-        // Example using a cookie:
-        cookie := http.Cookie{
-            Name:  "user",
-            Value: base64.StdEncoding.EncodeToString([]byte(user.Mail)),
-            Path:  "/",
-        }
-        http.SetCookie(w, &cookie)
+		// Set a session cookie or token here if needed
+		// Example using a cookie:
+		cookie := http.Cookie{
+			Name:  "user",
+			Value: base64.StdEncoding.EncodeToString([]byte(user.Mail)),
+			Path:  "/",
+		}
+		http.SetCookie(w, &cookie)
 
-        // Redirect the user after successful login
-        http.Redirect(w, r, "/", http.StatusSeeOther)
-        return
-    }
+		// Redirect the user after successful login
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 
-    // For GET request to /login, render the login form
-    renderTemplate(w, "assets/html/login", nil)
+	// For GET request to /login, render the login form
+	renderTemplate(w, "assets/html/login", nil)
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -307,7 +303,6 @@ func InsertUser(mail, hashedPassword string) error {
 	return err
 }
 
-
 func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 	t, err := template.ParseFiles("./" + tmpl + ".html")
 	if err != nil {
@@ -316,4 +311,3 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 	}
 	t.Execute(w, data)
 }
-

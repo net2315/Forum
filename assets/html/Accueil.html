@@ -12,7 +12,17 @@
 <body>
 <div class="navbar">
     <div class="title">
-        <div></div>
+        <div>
+            <div class="deroul">
+                <span class="menu">MENU</span>
+                <div>
+                    <input value="POST" type="button"/><br>
+                    <input value="POST" type="button"/><br>
+                    <input value="POST" type="button"/><br>
+                    <input value="POST" type="button"/>
+                </div>
+            </div>
+        </div>
         <h1 class="pageTitle">Gastroglobe</h1>
         <div class="user">
             <a href="./register">
@@ -27,16 +37,27 @@
     <div class="ButtonContainer">
         <button id="categorieGastroButton">Categorie</button>
         <div class="allbutton">
-            
+            {{range .}}
+            <article class="feature1">
+                <input type="checkbox" id="feature1"/>
+                <div>
+
+                <span>
+            {{.Nom}}
+          </span>
+
+                </div>
+                {{end}}
+            </article>
             <!-- {{range .}}
             <button class="bouton">{{.Nom}}</button>
             {{end}} -->
-            {{range .}}
-            <a href="/posts?id={{.ID}}">
-                <button class="bouton">{{.Nom}}</button>
-            </a>
-            {{end}}
-    
+<!--            {{range .}}-->
+<!--            <a href="/posts?id={{.ID}}">-->
+<!--                <button class="bouton">{{.Nom}}</button>-->
+<!--            </a>-->
+<!--            {{end}}-->
+
         </div>
         <button id="messagesCreesButton">Messages Créés</button>
         <button id="messagesAimesButton">Messages Aimés</button>
