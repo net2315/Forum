@@ -72,20 +72,19 @@ func GetCategories() ([]mag.Categorie, error) {
 
 	return categories, nil
 }
-
 func categoriesHandler(w http.ResponseWriter, r *http.Request) {
-	categories, err := GetCategories()
-	if err != nil {
-		http.Error(w, "Error retrieving categories", http.StatusInternalServerError)
-		return
-	}
+    categories, err := GetCategories()
+    if err != nil {
+        http.Error(w, "Erreur lors de la récupération des catégories", http.StatusInternalServerError)
+        return
+    }
 
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(w, "<html><body>")
-	for _, category := range categories {
-		fmt.Fprintf(w, `<p><a href="/posts?id=%d">%s</a></p>`, category.ID, category.Nom)
-	}
-	fmt.Fprintf(w, "</body></html>")
+    w.Header().Set("Content-Type", "text/html")
+    tmpl := template.Must(template.ParseFiles("assets/html/categories.html"))
+    err = tmpl.Execute(w, categories)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
 }
 
 func postsHandler(w http.ResponseWriter, r *http.Request) {
