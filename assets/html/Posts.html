@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" type="text/css" href="../css/posts.css">
+    <link rel="stylesheet" type="text/css" href="../css/Posts.css">
     <link rel="shortcut icon" href="../../media/téléchargement.jpeg" type="image/x-icon">
     <title>Posts</title>
 </head>
@@ -14,12 +14,14 @@
     <p>Description : {{.Categorie.Description}}</p>
     <h2>Posts</h2>
     {{range .Posts}}
-        <h3>Post ID: {{.ID}}</h3>
-        <p>{{.Texte}}</p>
-        <p>Date et Heure: {{.DateHeure}}</p>
-        {{if .Photo}}
-            <p><img src="data:image/png;base64,{{.Photo}}" alt="Post Photo"/></p>
-        {{end}}
+        <div class="post">
+            <h3>Post ID: {{.ID}}</h3>
+            <p>{{.Texte}}</p>
+            <p class="post-date">Date et Heure: {{.DateHeure}}</p>
+            {{if .Photo}}
+                <p><img src="data:image/png;base64,{{.Photo}}" alt="Post Photo"/></p>
+            {{end}}
+        </div>
     {{else}}
         <p>Aucun post dans cette catégorie.</p>
     {{end}}
