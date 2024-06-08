@@ -10,13 +10,22 @@
     <title>Liste des catégories</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Liste des catégories</h1>
-        <ul>
-            {{range .}}
-            <li>{{.Nom}}</li>
-            {{end}}
-        </ul>
+    <h1>Liste des catégories</h1>
+    <ul>
+        {{range .}}
+            <li><a href="/posts?id={{.ID}}">{{.Nom}}</a></li>
+        {{end}}
+    </ul>
+
+        <div>
+            <form action="/addCategory" method="POST">
+                <label for="nom">Nom de la catégorie:</label>
+                <input type="text" id="nom" name="nom" required>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>
     </div>
+    
 </body>
 </html>
+

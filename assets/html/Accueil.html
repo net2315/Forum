@@ -20,8 +20,6 @@
                 <div>
                     <a href="./categories">CATEGORIES</a><br>
                     <a>POST</a><br>
-                    <a>POST</a><br>
-                    <a>POST</a>
                 </div>
             </div>
         </div>
@@ -51,25 +49,9 @@
                 </div>
                 {{end}}
             </article>
-            <!-- {{range .}}
-            <button class="bouton">{{.Nom}}</button>
-            {{end}} -->
-<!--            {{range .}}-->
-<!--            <a href="/posts?id={{.ID}}">-->
-<!--                <button class="bouton">{{.Nom}}</button>-->
-<!--            </a>-->
-<!--            {{end}}-->
-
         </div>
         <button id="messagesCreesButton">Messages Créés</button>
         <button id="messagesAimesButton">Messages Aimés</button>
-    </div>
-    <div>
-        <form action="/addCategory" method="POST">
-            <label for="nom">Nom de la catégorie:</label>
-            <input type="text" id="nom" name="nom" required>
-            <button type="submit">Ajouter</button>
-        </form>
     </div>
 </div>
 </body>
