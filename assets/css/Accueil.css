@@ -122,3 +122,24 @@ input[type=checkbox]:checked ~ div {
     background-color: #008b31;
     border: 2px solid #008b31;
 }
+
+.posts-container {
+    margin-top: 70px; /* pour compenser la hauteur de la navbar */
+    padding: 20px;
+}
+.category-posts {
+    margin-bottom: 20px;
+    border: 1px solid #055006;
+    padding: 10px;
+    background-color: #2fb814;
+}
+.category-posts h3 {
+    margin-top: 0;
+}
+.posts-list {
+    list-style-type: none;
+    padding: 0;
+}
+.posts-list li {
+    margin-bottom: 5px;
+}
