@@ -8,77 +8,49 @@
     <link rel="stylesheet" type="text/css" href="../css/Accueil.css">
     <link rel="shortcut icon" href="../../media/téléchargement.jpeg" type="image/x-icon">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../main.js"></script>
 
     <title>Gastroglobe</title>
 </head>
 <body>
 
 
-
-<!-- <div class="navbar">
+<div class="navbar">
     <div class="title">
         <div>
-            <div class="deroul">
-                <span class="material-icons">menu</span>
-                <div>
-                    <a href="./categories">CATEGORIES</a><br>
-                    <a>POST</a><br>
-                </div>
+            <div class="pages">
+                <a href="./categories">Catégories</a>
+                <a href="./categories">Nouvelle catégorie</a>
+                <a href="./categories">Nouveau post</a>
             </div>
-        </div> -->
-
-
-         
-        <div class="navbar">
-            <div class="title">
-                <div>
-                    <a href="./categories">CATEGORIES</a><br>
-                    <a>POST</a><br>
-                </div>
+        </div>
         <h1 class="pageTitle">Gastroglobe</h1>
         <div class="user">
             <a href="./register">
-                <button>Register</button>
+                Register
             </a>
             <a href="./login">
-                <button>Login</button>
+                Login
             </a>
         </div>
     </div>
 
     <div class="ButtonContainer">
         <button id="categorieGastroButton">Categorie</button>
-        
-        <!-- <div class="allbutton">
+
+        <div class="allbutton">
             {{range .}}
             <article class="feature1">
-                <input type="checkbox" id="feature1"/>
                 <div>
-                <span>
-            {{.Nom}}
-          </span>
+                    <a href="/posts?id={{.ID}}">{{.Nom}}</a>
                 </div>
                 {{end}}
             </article>
-        </div> -->
-
-         <div class="allbutton">
-            {{range .}}
-            <article class="feature1">
-                <a href="/posts?id={{.ID}}">
-                    <span>{{.Nom}}</span>
-                </a>
-            </article>
-            {{end}}
-        </div> 
-
-
-
-         
+        </div>
         <button id="messagesCreesButton">Messages Créés</button>
         <button id="messagesAimesButton">Messages Aimés</button>
     </div>
-    
+
 </div>
 </body>
 </html> 

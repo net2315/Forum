@@ -15,25 +15,30 @@ button {
     cursor: pointer;
 }
 
+article {
+    display: flex;
+}
+
+a {
+    text-decoration: none;
+}
+
+article div {
+    border: 2px solid #85f6c3;
+    border-radius: 5px;
+    line-height: 25px;
+    padding: 1px 6px;
+    margin: 5px;
+    background-color: #85f6c3;
+}
+
 .navbar {
     position: sticky;
     top: 0;
     background-color: white;
     padding: 5px;
     z-index: 1000;
-}
-
-.deroul div {
-    display: none;
-}
-
-.deroul:hover div {
-    display: block;
-    position: sticky;
-}
-
-.menu {
-    background-color: #008b31;
+    margin: 5px;
 }
 
 .title {
@@ -41,15 +46,15 @@ button {
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr;
     align-items: center;
+    margin: 5px;
 }
 
 .user {
     display: flex;
     justify-content: right;
-
 }
 
-.user > button {
+.user > a {
     font-size: large;
     background-color: rgb(48, 173, 16);
     color: #fff;
@@ -58,7 +63,7 @@ button {
     margin: 8px;
 }
 
-a > button {
+.pages > a{
     font-size: large;
     background-color: rgb(48, 173, 16);
     color: #fff;
@@ -90,56 +95,4 @@ a > button {
     font-size: 15px;
     border-radius: 30px;
     margin: 8px;
-}
-
-article {
-    display: flex;
-}
-
-article div {
-    cursor: pointer;
-    border: 2px solid #85f6c3;
-    border-radius: 5px;
-    line-height: 25px;
-    font-size: small;
-    padding: 1px 6px;
-    margin: 5px;
-    background-color: #85f6c3;
-}
-
-article input {
-    position: absolute;
-    top: auto;
-    left: auto;
-    width: 100px;
-    height: 30px;
-    opacity: 0;
-    cursor: pointer;
-}
-
-
-input[type=checkbox]:checked ~ div {
-    background-color: #008b31;
-    border: 2px solid #008b31;
-}
-
-.posts-container {
-    margin-top: 70px; /* pour compenser la hauteur de la navbar */
-    padding: 20px;
-}
-.category-posts {
-    margin-bottom: 20px;
-    border: 1px solid #055006;
-    padding: 10px;
-    background-color: #2fb814;
-}
-.category-posts h3 {
-    margin-top: 0;
-}
-.posts-list {
-    list-style-type: none;
-    padding: 0;
-}
-.posts-list li {
-    margin-bottom: 5px;
 }
