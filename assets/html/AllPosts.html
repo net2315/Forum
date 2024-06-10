@@ -1,0 +1,78 @@
+ <!-- <!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="../css/AllPosts.css">
+    <link rel="shortcut icon" href="../../media/téléchargement.jpeg" type="image/x-icon">
+    <title>Posts</title>
+</head>
+<body>
+    <h1>Tous les Posts de Toutes les Catégories</h1>
+    <ul>
+        {{range .Posts}}
+        <li>
+            <h2>{{.Texte}}</h2>
+            <p>Publié dans la catégorie : {{.CategorieID}}</p>
+            <p>Publié le {{.DateHeure}}</p>
+            {{if .Photo}}
+            <img src="data:image/jpeg;base64,{{.Photo}}" alt="Photo">
+            {{end}}
+            <p>Commentaires :</p>
+            <ul>
+                {{range .Comments}}
+                <li>
+                    <p>{{.Texte}}</p>
+                </li>
+                {{end}}
+            </ul>
+        </li>
+        {{end}}
+    </ul>
+</body>
+</html>
+ -->
+ <!DOCTYPE html>
+ <html lang="fr">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport"
+           content="width=device-width, initial-scale=1.0">
+     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+     <link rel="stylesheet" type="text/css" href="../css/AllPosts.css">
+     <link rel="shortcut icon" href="../../media/téléchargement.jpeg" type="image/x-icon">
+     <title>Tous les Posts de Toutes les Catégories</title>
+ </head>
+ <body class="body">
+     <h1>Tous les Posts de Toutes les Catégories</h1>
+     <ul class="post-list">
+         {{range .Posts}}
+         <li class="post">
+             <h2 class="post-title">{{.Texte}}</h2>
+             <p class="post-category">Publié dans la catégorie : {{.CategorieID}}</p>
+             <p class="post-date">Publié le {{.DateHeure}}</p>
+             {{if .Photo}}
+             <img src="data:image/jpeg;base64,{{.Photo}}" alt="Photo" class="post-image">
+             {{end}}
+             <p class="post-comments-title">Commentaires :</p>
+             <ul class="comment-list">
+                 {{range .Comments}}
+                 <li class="comment">
+                     <p class="comment-text">{{.Texte}}</p>
+                 </li>
+                 {{end}}
+                 {{if eq (len .Comments) 0}}
+                 <li class="no-comments">Aucun commentaire pour ce post.</li>
+                 {{end}}
+             </ul>
+         </li>
+         {{end}}
+         {{if eq (len .Posts) 0}}
+         <li class="no-posts">Aucun post dans cette catégorie.</li>
+         {{end}}
+     </ul>
+ </body>
+ </html>
+ 
