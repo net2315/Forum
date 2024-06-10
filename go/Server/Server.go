@@ -14,6 +14,12 @@ import (
 
 var data []mag.Categorie
 
+type HomePageData struct {
+    Posts []mag.Post
+}
+
+
+
 const port = ":3000"
 
 func HandleFunc() {
@@ -31,6 +37,7 @@ func HandleFunc() {
 	http.HandleFunc("/addCategory", AddCategory)
 	http.HandleFunc("/addComment", AddCommentHandler)
 	http.HandleFunc("/categories-page", categoriesPageHandler)
+	http.HandleFunc("/all-posts", allPostsHandler)
 	http.HandleFunc("/posts", postsHandler)
 	http.Handle("/media/", http.StripPrefix("/media/", http.FileServer(http.Dir("./media"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./assets/css/"))))
@@ -41,6 +48,18 @@ func HandleFunc() {
 		return
 	}
 }
+
+func Home(w http.ResponseWriter, r *http.Request) {
+	categories, err := GetCategories()
+	if err != nil {
+		http.Error(w, "Erreur lors de la récupération des catégories", http.StatusInternalServerError)
+		return
+	}
+
+	renderTemplate(w, "assets/html/Accueil", categories)
+}
+
+
 
 func GetCategories() ([]mag.Categorie, error) {
 	//Open database
@@ -72,17 +91,6 @@ func GetCategories() ([]mag.Categorie, error) {
 	data = categories
 
 	return categories, nil
-}
-
-
-func Home(w http.ResponseWriter, r *http.Request) {
-	categories, err := GetCategories()
-	if err != nil {
-		http.Error(w, "Erreur lors de la récupération des catégories", http.StatusInternalServerError)
-		return
-	}
-
-	renderTemplate(w, "assets/html/Accueil", categories)
 }
 
 func InsertCategory(nom string) error {
@@ -292,6 +300,78 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     renderTemplate(w, "assets/html/Posts", data)
+}
+
+func GetPosts() ([]mag.Post, error) {
+    db, err := sql.Open("sqlite3", "./db/database.db")
+    if err != nil {
+        return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
+    }
+    defer db.Close()
+
+    rows, err := db.Query("SELECT id, categorie_id, texte, date_heure, photo FROM post")
+    if err != nil {
+        return nil, fmt.Errorf("erreur lors de la récupération des posts: %w", err)
+    }
+    defer rows.Close()
+
+    var posts []mag.Post
+    for rows.Next() {
+        var post mag.Post
+        if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &post.Photo); err != nil {
+            return nil, fmt.Errorf("erreur lors du scan des posts: %w", err)
+        }
+
+        comments, err := GetCommentsByPost(fmt.Sprint(post.ID))
+        if err != nil {
+            return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
+        }
+        post.Comments = comments
+
+        posts = append(posts, post)
+    }
+
+    if err = rows.Err(); err != nil {
+        return nil, fmt.Errorf("erreur lors du parcours des posts: %w", err)
+    }
+
+    return posts, nil
+}
+
+func allPostsHandler(w http.ResponseWriter, r *http.Request) {
+    // Récupérer toutes les catégories
+    categories, err := GetCategories()
+    if err != nil {
+        http.Error(w, "Erreur lors de la récupération des catégories: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    var allPosts []mag.Post
+
+    // Pour chaque catégorie, récupérer les posts et les ajouter à la liste
+    for _, cat := range categories {
+        posts, err := GetPostsByCategory(fmt.Sprint(cat.ID))
+        if err != nil {
+            http.Error(w, "Erreur lors de la récupération des posts pour la catégorie "+cat.Nom+": "+err.Error(), http.StatusInternalServerError)
+            return
+        }
+        allPosts = append(allPosts, posts...)
+    }
+
+    // Ici, vous pourriez ajuster les données pour l'affichage, par exemple encodage d'une image en base64
+    for i, post := range allPosts {
+        if len(post.Photo) > 0 {
+            allPosts[i].Photo = []byte(base64.StdEncoding.EncodeToString(post.Photo))
+        }
+    }
+
+    // Créer la structure de données pour le template
+    data := HomePageData{
+        Posts: allPosts,
+    }
+
+    // Rendre le template HTML
+    renderTemplate(w, "assets/html/AllPosts", data)
 }
 
 
