@@ -53,5 +53,31 @@
     </div>
 
 </div>
+<ul class="post-list">
+    {{range .Posts}}
+    <li class="post">
+        <h2 class="post-title">{{.Texte}}</h2>
+        <p class="post-category">Publié dans la catégorie : {{.CategorieID}}</p>
+        <p class="post-date">Publié le {{.DateHeure}}</p>
+        {{if .Photo}}
+        <img src="data:image/jpeg;base64,{{.Photo}}" alt="Photo" class="post-image">
+        {{end}}
+        <p class="post-comments-title">Commentaires :</p>
+        <ul class="comment-list">
+            {{range .Comments}}
+            <li class="comment">
+                <p class="comment-text">{{.Texte}}</p>
+            </li>
+            {{end}}
+            {{if eq (len .Comments) 0}}
+            <li class="no-comments">Aucun commentaire pour ce post.</li>
+            {{end}}
+        </ul>
+    </li>
+    {{end}}
+    {{if eq (len .Posts) 0}}
+    <li class="no-posts">Aucun post dans cette catégorie.</li>
+    {{end}}
+</ul>
 </body>
-</html> 
+</html>
