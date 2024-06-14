@@ -15,10 +15,8 @@ import (
 var data []mag.Categorie
 
 type HomePageData struct {
-    Posts []mag.Post
+	Posts []mag.Post
 }
-
-
 
 const port = ":3000"
 
@@ -58,8 +56,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	renderTemplate(w, "assets/html/Accueil", categories)
 }
-
-
 
 func GetCategories() ([]mag.Categorie, error) {
 	//Open database
@@ -133,18 +129,18 @@ func categoriesPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func categoriesHandler(w http.ResponseWriter, r *http.Request) {
-    categories, err := GetCategories()
-    if err != nil {
-        http.Error(w, "Erreur lors de la récupération des catégories", http.StatusInternalServerError)
-        return
-    }
+	categories, err := GetCategories()
+	if err != nil {
+		http.Error(w, "Erreur lors de la récupération des catégories", http.StatusInternalServerError)
+		return
+	}
 
-    w.Header().Set("Content-Type", "text/html")
-    tmpl := template.Must(template.ParseFiles("assets/html/categories.html"))
-    err = tmpl.Execute(w, categories)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-    }
+	w.Header().Set("Content-Type", "text/html")
+	tmpl := template.Must(template.ParseFiles("assets/html/categories.html"))
+	err = tmpl.Execute(w, categories)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func GetCategoryByID(categoryID string) (mag.Categorie, error) {
@@ -163,247 +159,243 @@ func GetCategoryByID(categoryID string) (mag.Categorie, error) {
 	return category, nil
 }
 
-
 func GetPostsByCategory(categoryID string) ([]mag.Post, error) {
-    db, err := sql.Open("sqlite3", "./db/database.db")
-    if err != nil {
-        return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
-    }
-    defer db.Close()
+	db, err := sql.Open("sqlite3", "./db/database.db")
+	if err != nil {
+		return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
+	}
+	defer db.Close()
 
-    rows, err := db.Query("SELECT id, categorie_id, texte, date_heure, photo FROM post WHERE categorie_id = ?", categoryID)
-    if err != nil {
-        return nil, fmt.Errorf("erreur lors de la récupération des posts: %w", err)
-    }
-    defer rows.Close()
+	rows, err := db.Query("SELECT id, categorie_id, texte, date_heure, photo FROM post WHERE categorie_id = ?", categoryID)
+	if err != nil {
+		return nil, fmt.Errorf("erreur lors de la récupération des posts: %w", err)
+	}
+	defer rows.Close()
 
-    var posts []mag.Post
-    for rows.Next() {
-        var post mag.Post
-        if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &post.Photo); err != nil {
-            return nil, fmt.Errorf("erreur lors du scan des posts: %w", err)
-        }
+	var posts []mag.Post
+	for rows.Next() {
+		var post mag.Post
+		if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &post.Photo); err != nil {
+			return nil, fmt.Errorf("erreur lors du scan des posts: %w", err)
+		}
 
-        // Récupérer les commentaires pour chaque post
-        comments, err := GetCommentsByPost(fmt.Sprint(post.ID))
-        if err != nil {
-            return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
-        }
-        post.Comments = comments
+		// Récupérer les commentaires pour chaque post
+		comments, err := GetCommentsByPost(fmt.Sprint(post.ID))
+		if err != nil {
+			return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
+		}
+		post.Comments = comments
 
-        posts = append(posts, post)
-    }
+		posts = append(posts, post)
+	}
 
-    if err = rows.Err(); err != nil {
-        return nil, fmt.Errorf("erreur lors du parcours des posts: %w", err)
-    }
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("erreur lors du parcours des posts: %w", err)
+	}
 
-    return posts, nil
+	return posts, nil
 }
 
-
 func AddComment(w http.ResponseWriter, r *http.Request) {
-    if r.Method == "POST" {
-        // Parse form values
-        postID := r.FormValue("post_id")
-        userID := r.FormValue("user_id")
-        texte := r.FormValue("texte")
+	if r.Method == "POST" {
+		// Parse form values
+		postID := r.FormValue("post_id")
+		userID := r.FormValue("user_id")
+		texte := r.FormValue("texte")
 
-        if postID == "" || userID == "" || texte == "" {
-            http.Error(w, "Tous les champs sont obligatoires", http.StatusBadRequest)
-            return
-        }
+		if postID == "" || userID == "" || texte == "" {
+			http.Error(w, "Tous les champs sont obligatoires", http.StatusBadRequest)
+			return
+		}
 
-        // Insert comment into the database
-        err := InsertComment(postID, userID, texte)
-        if err != nil {
-            http.Error(w, "Erreur lors de l'ajout du commentaire", http.StatusInternalServerError)
-            return
-        }
+		// Insert comment into the database
+		err := InsertComment(postID, userID, texte)
+		if err != nil {
+			http.Error(w, "Erreur lors de l'ajout du commentaire", http.StatusInternalServerError)
+			return
+		}
 
-        // Redirect to the post page
-        http.Redirect(w, r, fmt.Sprintf("/posts?id=%s", postID), http.StatusSeeOther)
-    } else {
-        http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
-    }
+		// Redirect to the post page
+		http.Redirect(w, r, fmt.Sprintf("/posts?id=%s", postID), http.StatusSeeOther)
+	} else {
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+	}
 }
 
 func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method == "POST" {
-        // Récupérer les données du formulaire
-        userID := r.FormValue("user_id")
-        postID := r.FormValue("post_id")
-        texte := r.FormValue("texte")
+	if r.Method == "POST" {
+		// Récupérer les données du formulaire
+		userID := r.FormValue("user_id")
+		postID := r.FormValue("post_id")
+		texte := r.FormValue("texte")
 
-        // Insérer le commentaire dans la base de données
-        err := InsertComment(userID, postID, texte)
-        if err != nil {
-            http.Error(w, "Erreur lors de l'insertion du commentaire", http.StatusInternalServerError)
-            return
-        }
+		// Insérer le commentaire dans la base de données
+		err := InsertComment(userID, postID, texte)
+		if err != nil {
+			http.Error(w, "Erreur lors de l'insertion du commentaire", http.StatusInternalServerError)
+			return
+		}
 
-        // Rediriger ou renvoyer une réponse appropriée après l'insertion réussie
-        http.Redirect(w, r, "/", http.StatusSeeOther)
-        return
-    }
+		// Rediriger ou renvoyer une réponse appropriée après l'insertion réussie
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 
-    // Pour les méthodes autres que POST, retourner une erreur HTTP appropriée
-    http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+	// Pour les méthodes autres que POST, retourner une erreur HTTP appropriée
+	http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 }
 
 func InsertComment(userID, postID, texte string) error {
-    db, err := sql.Open("sqlite3", "./db/database.db")
-    if err != nil {
-        return err
-    }
-    defer db.Close()
+	db, err := sql.Open("sqlite3", "./db/database.db")
+	if err != nil {
+		return err
+	}
+	defer db.Close()
 
-    _, err = db.Exec("INSERT INTO comments (UserID, PostID, Texte) VALUES (?, ?, ?)", userID, postID, texte)
-    if err != nil {
-        return err
-    }
+	_, err = db.Exec("INSERT INTO comments (UserID, PostID, Texte) VALUES (?, ?, ?)", userID, postID, texte)
+	if err != nil {
+		return err
+	}
 
-    return nil
+	return nil
 }
 
 func postsHandler(w http.ResponseWriter, r *http.Request) {
-    categoryID := r.URL.Query().Get("id")
-    if categoryID == "" {
-        http.Error(w, "ID de la catégorie est manquant", http.StatusBadRequest)
-        return
-    }
+	categoryID := r.URL.Query().Get("id")
+	if categoryID == "" {
+		http.Error(w, "ID de la catégorie est manquant", http.StatusBadRequest)
+		return
+	}
 
-    category, err := GetCategoryByID(categoryID)
-    if err != nil {
-        http.Error(w, "Erreur lors de la récupération de la catégorie: "+err.Error(), http.StatusInternalServerError)
-        return
-    }
+	category, err := GetCategoryByID(categoryID)
+	if err != nil {
+		http.Error(w, "Erreur lors de la récupération de la catégorie: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    posts, err := GetPostsByCategory(categoryID)
-    if err != nil {
-        http.Error(w, "Erreur lors de la récupération des posts: "+err.Error(), http.StatusInternalServerError)
-        return
-    }
+	posts, err := GetPostsByCategory(categoryID)
+	if err != nil {
+		http.Error(w, "Erreur lors de la récupération des posts: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    for i, post := range posts {
-        if len(post.Photo) > 0 {
-            posts[i].Photo = []byte(base64.StdEncoding.EncodeToString(post.Photo))
-        }
-    }
+	for i, post := range posts {
+		if len(post.Photo) > 0 {
+			posts[i].Photo = []byte(base64.StdEncoding.EncodeToString(post.Photo))
+		}
+	}
 
-    data := struct {
-        Categorie mag.Categorie
-        Posts     []mag.Post
-    }{
-        Categorie: category,
-        Posts:     posts,
-    }
+	data := struct {
+		Categorie mag.Categorie
+		Posts     []mag.Post
+	}{
+		Categorie: category,
+		Posts:     posts,
+	}
 
-    renderTemplate(w, "assets/html/Posts", data)
+	renderTemplate(w, "assets/html/Posts", data)
 }
 
 func GetPosts() ([]mag.Post, error) {
-    db, err := sql.Open("sqlite3", "./db/database.db")
-    if err != nil {
-        return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
-    }
-    defer db.Close()
+	db, err := sql.Open("sqlite3", "./db/database.db")
+	if err != nil {
+		return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
+	}
+	defer db.Close()
 
-    rows, err := db.Query("SELECT id, categorie_id, texte, date_heure, photo FROM post")
-    if err != nil {
-        return nil, fmt.Errorf("erreur lors de la récupération des posts: %w", err)
-    }
-    defer rows.Close()
+	rows, err := db.Query("SELECT id, categorie_id, texte, date_heure, photo FROM post")
+	if err != nil {
+		return nil, fmt.Errorf("erreur lors de la récupération des posts: %w", err)
+	}
+	defer rows.Close()
 
-    var posts []mag.Post
-    for rows.Next() {
-        var post mag.Post
-        if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &post.Photo); err != nil {
-            return nil, fmt.Errorf("erreur lors du scan des posts: %w", err)
-        }
+	var posts []mag.Post
+	for rows.Next() {
+		var post mag.Post
+		if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &post.Photo); err != nil {
+			return nil, fmt.Errorf("erreur lors du scan des posts: %w", err)
+		}
 
-        comments, err := GetCommentsByPost(fmt.Sprint(post.ID))
-        if err != nil {
-            return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
-        }
-        post.Comments = comments
+		comments, err := GetCommentsByPost(fmt.Sprint(post.ID))
+		if err != nil {
+			return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
+		}
+		post.Comments = comments
 
-        posts = append(posts, post)
-    }
+		posts = append(posts, post)
+	}
 
-    if err = rows.Err(); err != nil {
-        return nil, fmt.Errorf("erreur lors du parcours des posts: %w", err)
-    }
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("erreur lors du parcours des posts: %w", err)
+	}
 
-    return posts, nil
+	return posts, nil
 }
 
 func allPostsHandler(w http.ResponseWriter, r *http.Request) {
-    // Récupérer toutes les catégories
-    categories, err := GetCategories()
-    if err != nil {
-        http.Error(w, "Erreur lors de la récupération des catégories: "+err.Error(), http.StatusInternalServerError)
-        return
-    }
+	// Récupérer toutes les catégories
+	categories, err := GetCategories()
+	if err != nil {
+		http.Error(w, "Erreur lors de la récupération des catégories: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    var allPosts []mag.Post
+	var allPosts []mag.Post
 
-    // Pour chaque catégorie, récupérer les posts et les ajouter à la liste
-    for _, cat := range categories {
-        posts, err := GetPostsByCategory(fmt.Sprint(cat.ID))
-        if err != nil {
-            http.Error(w, "Erreur lors de la récupération des posts pour la catégorie "+cat.Nom+": "+err.Error(), http.StatusInternalServerError)
-            return
-        }
-        allPosts = append(allPosts, posts...)
-    }
+	// Pour chaque catégorie, récupérer les posts et les ajouter à la liste
+	for _, cat := range categories {
+		posts, err := GetPostsByCategory(fmt.Sprint(cat.ID))
+		if err != nil {
+			http.Error(w, "Erreur lors de la récupération des posts pour la catégorie "+cat.Nom+": "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		allPosts = append(allPosts, posts...)
+	}
 
-    // Ici, vous pourriez ajuster les données pour l'affichage, par exemple encodage d'une image en base64
-    for i, post := range allPosts {
-        if len(post.Photo) > 0 {
-            allPosts[i].Photo = []byte(base64.StdEncoding.EncodeToString(post.Photo))
-        }
-    }
+	// Ici, vous pourriez ajuster les données pour l'affichage, par exemple encodage d'une image en base64
+	for i, post := range allPosts {
+		if len(post.Photo) > 0 {
+			allPosts[i].Photo = []byte(base64.StdEncoding.EncodeToString(post.Photo))
+		}
+	}
 
-    // Créer la structure de données pour le template
-    data := HomePageData{
-        Posts: allPosts,
-    }
+	// Créer la structure de données pour le template
+	data := HomePageData{
+		Posts: allPosts,
+	}
 
-    // Rendre le template HTML
-    renderTemplate(w, "assets/html/AllPosts", data)
+	// Rendre le template HTML
+	renderTemplate(w, "assets/html/AllPosts", data)
 }
-
 
 func GetCommentsByPost(postID string) ([]mag.Comment, error) {
-    db, err := sql.Open("sqlite3", "./db/database.db")
-    if err != nil {
-        return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
-    }
-    defer db.Close()
+	db, err := sql.Open("sqlite3", "./db/database.db")
+	if err != nil {
+		return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
+	}
+	defer db.Close()
 
-    rows, err := db.Query("SELECT ID, UserID, Texte, DateHeure, Likes, PostID FROM comments WHERE PostID = ?", postID)
-    if err != nil {
-        return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
-    }
-    defer rows.Close()
+	rows, err := db.Query("SELECT ID, UserID, Texte, DateHeure, Likes, PostID FROM comments WHERE PostID = ?", postID)
+	if err != nil {
+		return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
+	}
+	defer rows.Close()
 
-    var comments []mag.Comment
-    for rows.Next() {
-        var comment mag.Comment
-        if err := rows.Scan(&comment.ID, &comment.UserID, &comment.Texte, &comment.DateHeure, &comment.Likes, &comment.PostID); err != nil {
-            return nil, fmt.Errorf("erreur lors du scan des commentaires: %w", err)
-        }
-        comments = append(comments, comment)
-    }
+	var comments []mag.Comment
+	for rows.Next() {
+		var comment mag.Comment
+		if err := rows.Scan(&comment.ID, &comment.UserID, &comment.Texte, &comment.DateHeure, &comment.Likes, &comment.PostID); err != nil {
+			return nil, fmt.Errorf("erreur lors du scan des commentaires: %w", err)
+		}
+		comments = append(comments, comment)
+	}
 
-    if err = rows.Err(); err != nil {
-        return nil, fmt.Errorf("erreur lors du parcours des commentaires: %w", err)
-    }
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("erreur lors du parcours des commentaires: %w", err)
+	}
 
-    return comments, nil
+	return comments, nil
 }
-
 
 func AuthenticateUser(mail, password string) (mag.User, error) {
 	db, err := sql.Open("sqlite3", "./db/database.db")
@@ -456,7 +448,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "assets/html/login", nil)
 }
 
-
 func Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		mail := r.FormValue("mail")
@@ -499,4 +490,3 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 	}
 	t.Execute(w, data)
 }
-
