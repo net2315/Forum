@@ -7,12 +7,12 @@ type Categorie struct {
 }
 
 type Post struct {
-	ID         int
+	ID          int
 	CategorieID int
-	Texte      string
-	DateHeure  string 
-	Photo      []byte
-	Comments   []Comment 
+	Texte       string
+	DateHeure   string
+	Photo       []byte
+	Comments    []Comment
 }
 
 type User struct {
@@ -25,10 +25,10 @@ type User struct {
 }
 
 type Comment struct {
-	ID         int
-	UserID     int
-	PostID    int  
-	Texte      string
-	DateHeure  string
-	Likes      int
+	ID        int
+	UserID    int
+	PostID    int
+	Texte     string
+	DateHeure string
+	Likes     int
 }

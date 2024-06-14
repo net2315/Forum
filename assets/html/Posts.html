@@ -10,50 +10,50 @@
     <title>Posts</title>
 </head>
 <body>
-    <h1>Catégorie : {{.Categorie.Nom}}</h1>
-    <p>Description : {{.Categorie.Description}}</p>
-    <h2>Posts</h2>
-    {{range .Posts}}
-        <div class="post">
-            <h3>Post ID: {{.ID}}</h3>
-            <p>{{.Texte}}</p>
-            <p class="post-date">Date et Heure: {{.DateHeure}}</p>
-            {{if .Photo}}
-                <p><img src="data:image/png;base64,{{.Photo}}" alt="Post Photo"/></p>
-            {{end}}
-            
-            <h4>Commentaires</h4>
-            {{range .Comments}}
-                <div class="comment">
-                    <p>{{.Texte}}</p>
-                    <p class="comment-date">Date et Heure: {{.DateHeure}}</p>
-                    <p>Likes: {{.Likes}}</p>
-                </div>
-            {{else}}
-                <p>Aucun commentaire pour ce post.</p>
-            {{end}}
-
-            <h4>Ajouter un commentaire</h4>
-            <form action="/addComment" method="POST">
-                <input type="hidden" name="post_id" value="{{.ID}}">
-                <label for="texte">Texte :</label><br>
-                <textarea id="texte" name="texte" rows="2" cols="50"></textarea><br>
-                <input type="submit" value="Ajouter">
-            </form>
-            
-        </div>
-    {{else}}
-        <p>Aucun post dans cette catégorie.</p>
+<h1>Catégorie : {{.Categorie.Nom}}</h1>
+<p>Description : {{.Categorie.Description}}</p>
+<h2>Posts</h2>
+{{range .Posts}}
+<div class="post">
+    <h3>Post ID: {{.ID}}</h3>
+    <p>{{.Texte}}</p>
+    <p class="post-date">Date et Heure: {{.DateHeure}}</p>
+    {{if .Photo}}
+    <p><img src="data:image/png;base64,{{.Photo}}" alt="Post Photo"/></p>
     {{end}}
-    
-    <h2>Ajouter un Post</h2>
-    <form action="/addPost" method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="category_id" value="{{.Categorie.ID}}">
+
+    <h4>Commentaires</h4>
+    {{range .Comments}}
+    <div class="comment">
+        <p>{{.Texte}}</p>
+        <p class="comment-date">Date et Heure: {{.DateHeure}}</p>
+        <p>Likes: {{.Likes}}</p>
+    </div>
+    {{else}}
+    <p>Aucun commentaire pour ce post.</p>
+    {{end}}
+
+    <h4>Ajouter un commentaire</h4>
+    <form action="/addComment" method="POST">
+        <input type="hidden" name="post_id" value="{{.ID}}">
         <label for="texte">Texte :</label><br>
-        <textarea id="texte" name="texte" rows="4" cols="50"></textarea><br>
-        <label for="photo">Photo :</label><br>
-        <input type="file" id="photo" name="photo"><br>
+        <textarea id="texte" name="texte" rows="2" cols="50"></textarea><br>
         <input type="submit" value="Ajouter">
     </form>
+
+</div>
+{{else}}
+<p>Aucun post dans cette catégorie.</p>
+{{end}}
+
+<h2>Ajouter un Post</h2>
+<form action="/addPost" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="category_id" value="{{.Categorie.ID}}">
+    <label for="texte">Texte :</label><br>
+    <textarea id="texte" name="texte" rows="4" cols="50"></textarea><br>
+    <label for="photo">Photo :</label><br>
+    <input type="file" id="photo" name="photo"><br>
+    <input type="submit" value="Ajouter">
+</form>
 </body>
 </html>

@@ -50,7 +50,7 @@ a {
     margin: 8px;
 }
 
-.pages > a{
+.pages > a {
     font-size: large;
     background-color: rgb(48, 173, 16);
     color: #fff;
@@ -125,8 +125,8 @@ p {
 
 .post-list, .comment-list {
     list-style-type: none; /* Retire les puces */
-    padding-left: 0; 
-    display: flex; 
-    flex-wrap: wrap; 
-    justify-content: space-around; 
+    padding-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
 }
