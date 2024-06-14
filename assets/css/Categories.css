@@ -50,7 +50,7 @@ a {
     margin: 8px;
 }
 
-.pages > a{
+.pages > a {
     font-size: large;
     background-color: rgb(48, 173, 16);
     color: #fff;
@@ -67,3 +67,28 @@ a {
     justify-content: flex-start;
     align-items: center;
 }
+
+.categorie {
+    display: grid;
+    grid-template-columns: 20% 20%;
+    justify-content: space-evenly;
+}
+
+.categorie > button {
+    background-color: white;
+    color: black;
+    border: 2px solid #04AA6D;
+    padding: 26px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 20px 20px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+.categorie > button:hover {
+    background-color: #04AA6D;
+    color: white;
+}
+
