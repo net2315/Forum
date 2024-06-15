@@ -13,6 +13,7 @@ type Post struct {
 	DateHeure   string
 	Photo       []byte
 	Comments    []Comment
+	Likes       int
 }
 
 type User struct {
@@ -31,4 +32,18 @@ type Comment struct {
 	Texte     string
 	DateHeure string
 	Likes     int
+}
+
+type MessagesCree struct {
+	ID           int    `json:"id"`
+	PostID       int    `json:"post_id"`
+	UserID       int    `json:"user_id"`
+	DateCreation string `json:"date_creation"` 
+}
+
+type MessagesAime struct {
+	ID        int    `json:"id"`
+	PostID    int    `json:"post_id"`
+	UserID    int    `json:"user_id"`
+	DateAimee string `json:"date_aimee"` 
 }
