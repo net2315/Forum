@@ -22,6 +22,14 @@
     <p><img src="data:image/png;base64,{{.Photo}}" alt="Post Photo"/></p>
     {{end}}
 
+    
+    <p>Likes: {{.Likes}}</p>
+    
+    <form action="/likePost" method="POST">
+        <input type="hidden" name="post_id" value="{{.ID}}">
+        <input type="submit" value="Like">
+    </form>
+
     <h4>Commentaires</h4>
     {{range .Comments}}
     <div class="comment">
