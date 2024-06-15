@@ -37,6 +37,8 @@ func HandleFunc() {
 	http.HandleFunc("/categories-page", categoriesPageHandler)
 	http.HandleFunc("/all-posts", allPostsHandler)
 	http.HandleFunc("/posts", postsHandler)
+	http.HandleFunc("/messagesCrees", messagesCreesHandler)
+	http.HandleFunc("/messagesAimes", messagesAimesHandler)
 	http.Handle("/media/", http.StripPrefix("/media/", http.FileServer(http.Dir("./media"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./assets/css/"))))
 
@@ -56,6 +58,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	renderTemplate(w, "assets/html/Accueil", categories)
 }
+
 
 func GetCategories() ([]mag.Categorie, error) {
 	//Open database
@@ -260,6 +263,7 @@ func InsertComment(userID, postID, texte string) error {
 	return nil
 }
 
+
 func postsHandler(w http.ResponseWriter, r *http.Request) {
 	categoryID := r.URL.Query().Get("id")
 	if categoryID == "" {
@@ -297,40 +301,41 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPosts() ([]mag.Post, error) {
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
-	}
-	defer db.Close()
+    db, err := sql.Open("sqlite3", "./db/database.db")
+    if err != nil {
+        return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
+    }
+    defer db.Close()
 
-	rows, err := db.Query("SELECT id, categorie_id, texte, date_heure, photo FROM post")
-	if err != nil {
-		return nil, fmt.Errorf("erreur lors de la récupération des posts: %w", err)
-	}
-	defer rows.Close()
+    rows, err := db.Query("SELECT id, categorie_id, texte, date_heure, photo, likes FROM post")
+    if err != nil {
+        return nil, fmt.Errorf("erreur lors de la récupération des posts: %w", err)
+    }
+    defer rows.Close()
 
-	var posts []mag.Post
-	for rows.Next() {
-		var post mag.Post
-		if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &post.Photo); err != nil {
-			return nil, fmt.Errorf("erreur lors du scan des posts: %w", err)
-		}
+    var posts []mag.Post
+    for rows.Next() {
+        var post mag.Post
+        if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &post.Photo, &post.Likes); err != nil {
+            return nil, fmt.Errorf("erreur lors du scan des posts: %w", err)
+        }
 
-		comments, err := GetCommentsByPost(fmt.Sprint(post.ID))
-		if err != nil {
-			return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
-		}
-		post.Comments = comments
+        comments, err := GetCommentsByPost(fmt.Sprint(post.ID))
+        if err != nil {
+            return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
+        }
+        post.Comments = comments
 
-		posts = append(posts, post)
-	}
+        posts = append(posts, post)
+    }
 
-	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("erreur lors du parcours des posts: %w", err)
-	}
+    if err = rows.Err(); err != nil {
+        return nil, fmt.Errorf("erreur lors du parcours des posts: %w", err)
+    }
 
-	return posts, nil
+    return posts, nil
 }
+
 
 func allPostsHandler(w http.ResponseWriter, r *http.Request) {
 	// Récupérer toutes les catégories
@@ -395,6 +400,44 @@ func GetCommentsByPost(postID string) ([]mag.Comment, error) {
 	}
 
 	return comments, nil
+}
+
+func InsertLike(postID, userID int, likeType string, sticker []byte) error {
+    db, err := sql.Open("sqlite3", "./db/database.db")
+    if err != nil {
+        return err
+    }
+    defer db.Close()
+
+    tx, err := db.Begin()
+    if err != nil {
+        return err
+    }
+
+    res, err := tx.Exec("INSERT INTO Likes (post_id, user_id, type) VALUES (?, ?, ?)", postID, userID, likeType)
+    if err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    likeID, err := res.LastInsertId()
+    if err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    _, err = tx.Exec("INSERT INTO Stickers (like_id, sticker) VALUES (?, ?)", likeID, sticker)
+    if err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    err = tx.Commit()
+    if err != nil {
+        return err
+    }
+
+    return nil
 }
 
 func AuthenticateUser(mail, password string) (mag.User, error) {
@@ -489,4 +532,88 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 		return
 	}
 	t.Execute(w, data)
+}
+
+func GetMessagesCrees(userID int) ([]mag.MessagesCree, error) {
+	db, err := sql.Open("sqlite3", "./db/database.db")
+	if err != nil {
+		return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT id, post_id, user_id, date_creation FROM MessagesCree WHERE user_id = ?", userID)
+	if err != nil {
+		return nil, fmt.Errorf("erreur lors de la récupération des messages créés: %w", err)
+	}
+	defer rows.Close()
+
+	var messagesCrees []mag.MessagesCree
+	for rows.Next() {
+		var message mag.MessagesCree
+		if err := rows.Scan(&message.ID, &message.PostID, &message.UserID, &message.DateCreation); err != nil {
+			return nil, fmt.Errorf("erreur lors du scan des messages créés: %w", err)
+		}
+		messagesCrees = append(messagesCrees, message)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("erreur lors du parcours des messages créés: %w", err)
+	}
+
+	return messagesCrees, nil
+}
+
+func GetMessagesAimes(userID int) ([]mag.MessagesAime, error) {
+	db, err := sql.Open("sqlite3", "./db/database.db")
+	if err != nil {
+		return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT id, post_id, user_id, date_aimee FROM MessagesAime WHERE user_id = ?", userID)
+	if err != nil {
+		return nil, fmt.Errorf("erreur lors de la récupération des messages aimés: %w", err)
+	}
+	defer rows.Close()
+
+	var messagesAimes []mag.MessagesAime
+	for rows.Next() {
+		var message mag.MessagesAime
+		if err := rows.Scan(&message.ID, &message.PostID, &message.UserID, &message.DateAimee); err != nil {
+			return nil, fmt.Errorf("erreur lors du scan des messages aimés: %w", err)
+		}
+		messagesAimes = append(messagesAimes, message)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("erreur lors du parcours des messages aimés: %w", err)
+	}
+
+	return messagesAimes, nil
+}
+
+func messagesCreesHandler(w http.ResponseWriter, r *http.Request) {
+   
+    userID := 1 
+
+    messagesCrees, err := GetMessagesCrees(userID)
+    if err != nil {
+        http.Error(w, "Erreur lors de la récupération des messages créés: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    renderTemplate(w, "assets/html/MessagesCrees", messagesCrees)
+}
+
+func messagesAimesHandler(w http.ResponseWriter, r *http.Request) {
+   
+    userID := 1 
+
+    messagesAimes, err := GetMessagesAimes(userID)
+    if err != nil {
+        http.Error(w, "Erreur lors de la récupération des messages aimés: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    renderTemplate(w, "assets/html/MessagesAimes", messagesAimes)
 }
