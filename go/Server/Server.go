@@ -22,12 +22,6 @@ type HomePageData struct {
 const port = ":3000"
 
 func HandleFunc() {
-	// Initialiser les données au démarrage du serveur
-	_, err := GetCategories()
-	if err != nil {
-		fmt.Println("Erreur lors de l'initialisation des catégories:", err)
-		return
-	}
 
 	http.HandleFunc("/", Home)
 	http.HandleFunc("/login", Login)
@@ -43,7 +37,7 @@ func HandleFunc() {
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./assets/css/"))))
 
 	fmt.Println("http://localhost:3000 - Serveur démarré sur le port :3000")
-	err = http.ListenAndServe(port, nil)
+	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		return
 	}
