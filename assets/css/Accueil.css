@@ -39,6 +39,7 @@ article div {
     padding: 5px;
     z-index: 1000;
     margin: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .title {
@@ -99,4 +100,49 @@ article div {
     font-size: 15px;
     border-radius: 30px;
     margin: 8px;
+}
+
+p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.post {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.post:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.post img {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+.post-date {
+    font-size: 0.9em;
+    color: #999;
+    margin-top: 10px;
+}
+
+.post-list {
+    list-style-type: none; /* Retire les puces */
+    padding-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.comment-list {
+    list-style-type: none;
 }

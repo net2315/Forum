@@ -11,7 +11,7 @@
     <script src="../main.js"></script>
 
     <title>Gastroglobe</title>
-    
+
 </head>
 <body>
 
@@ -41,7 +41,7 @@
         <button id="categorieGastroButton">Categorie</button>
 
         <div class="allbutton">
-            {{range .}}
+            {{range .Categories}}
             <article class="feature1">
                 <div>
                     <a href="/posts?id={{.ID}}">{{.Nom}}</a>
@@ -49,7 +49,6 @@
                 {{end}}
             </article>
         </div>
-        <!-- <button id="messagesCreesButton">Messages Créés</button> -->
         <button id="messagesCreesButton"><a href="./MessagesCrees.html"></a>Messages Créés</button>
 
 
@@ -71,6 +70,7 @@
             {{range .Comments}}
             <li class="comment">
                 <p class="comment-text">{{.Texte}}</p>
+                <hr>
             </li>
             {{end}}
             {{if eq (len .Comments) 0}}

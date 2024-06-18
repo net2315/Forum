@@ -15,7 +15,8 @@ import (
 var data []mag.Categorie
 
 type HomePageData struct {
-	Posts []mag.Post
+	Posts      []mag.Post
+	Categories []mag.Categorie
 }
 
 const port = ":3000"
@@ -35,7 +36,6 @@ func HandleFunc() {
 	http.HandleFunc("/addCategory", AddCategory)
 	http.HandleFunc("/addComment", AddCommentHandler)
 	http.HandleFunc("/categories-page", categoriesPageHandler)
-	http.HandleFunc("/all-posts", allPostsHandler)
 	http.HandleFunc("/posts", postsHandler)
 	http.HandleFunc("/messagesCrees", messagesCreesHandler)
 	http.HandleFunc("/messagesAimes", messagesAimesHandler)
@@ -50,15 +50,40 @@ func HandleFunc() {
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
+	// Récupérer toutes les catégories
 	categories, err := GetCategories()
 	if err != nil {
-		http.Error(w, "Erreur lors de la récupération des catégories", http.StatusInternalServerError)
+		http.Error(w, "Erreur lors de la récupération des catégories: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	renderTemplate(w, "assets/html/Accueil", categories)
-}
+	var allPosts []mag.Post
 
+	// Pour chaque catégorie, récupérer les posts et les ajouter à la liste
+	for _, cat := range categories {
+		posts, err := GetPostsByCategory(fmt.Sprint(cat.ID))
+		if err != nil {
+			http.Error(w, "Erreur lors de la récupération des posts pour la catégorie "+cat.Nom+": "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		allPosts = append(allPosts, posts...)
+	}
+
+	// Ici, vous pourriez ajuster les données pour l'affichage, par exemple encodage d'une image en base64
+	for i, post := range allPosts {
+		if len(post.Photo) > 0 {
+			allPosts[i].Photo = []byte(base64.StdEncoding.EncodeToString(post.Photo))
+		}
+	}
+
+	// Créer la structure de données pour le template
+	data := HomePageData{
+		Categories: categories, // Ajouter les catégories à la structure de données
+		Posts:      allPosts,
+	}
+
+	renderTemplate(w, "assets/html/Accueil", data)
+}
 
 func GetCategories() ([]mag.Categorie, error) {
 	//Open database
@@ -263,7 +288,6 @@ func InsertComment(userID, postID, texte string) error {
 	return nil
 }
 
-
 func postsHandler(w http.ResponseWriter, r *http.Request) {
 	categoryID := r.URL.Query().Get("id")
 	if categoryID == "" {
@@ -301,76 +325,39 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPosts() ([]mag.Post, error) {
-    db, err := sql.Open("sqlite3", "./db/database.db")
-    if err != nil {
-        return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
-    }
-    defer db.Close()
-
-    rows, err := db.Query("SELECT id, categorie_id, texte, date_heure, photo, likes FROM post")
-    if err != nil {
-        return nil, fmt.Errorf("erreur lors de la récupération des posts: %w", err)
-    }
-    defer rows.Close()
-
-    var posts []mag.Post
-    for rows.Next() {
-        var post mag.Post
-        if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &post.Photo, &post.Likes); err != nil {
-            return nil, fmt.Errorf("erreur lors du scan des posts: %w", err)
-        }
-
-        comments, err := GetCommentsByPost(fmt.Sprint(post.ID))
-        if err != nil {
-            return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
-        }
-        post.Comments = comments
-
-        posts = append(posts, post)
-    }
-
-    if err = rows.Err(); err != nil {
-        return nil, fmt.Errorf("erreur lors du parcours des posts: %w", err)
-    }
-
-    return posts, nil
-}
-
-
-func allPostsHandler(w http.ResponseWriter, r *http.Request) {
-	// Récupérer toutes les catégories
-	categories, err := GetCategories()
+	db, err := sql.Open("sqlite3", "./db/database.db")
 	if err != nil {
-		http.Error(w, "Erreur lors de la récupération des catégories: "+err.Error(), http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("erreur d'ouverture de la base de données: %w", err)
 	}
+	defer db.Close()
 
-	var allPosts []mag.Post
+	rows, err := db.Query("SELECT id, categorie_id, texte, date_heure, photo, likes FROM post")
+	if err != nil {
+		return nil, fmt.Errorf("erreur lors de la récupération des posts: %w", err)
+	}
+	defer rows.Close()
 
-	// Pour chaque catégorie, récupérer les posts et les ajouter à la liste
-	for _, cat := range categories {
-		posts, err := GetPostsByCategory(fmt.Sprint(cat.ID))
+	var posts []mag.Post
+	for rows.Next() {
+		var post mag.Post
+		if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &post.Photo, &post.Likes); err != nil {
+			return nil, fmt.Errorf("erreur lors du scan des posts: %w", err)
+		}
+
+		comments, err := GetCommentsByPost(fmt.Sprint(post.ID))
 		if err != nil {
-			http.Error(w, "Erreur lors de la récupération des posts pour la catégorie "+cat.Nom+": "+err.Error(), http.StatusInternalServerError)
-			return
+			return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
 		}
-		allPosts = append(allPosts, posts...)
+		post.Comments = comments
+
+		posts = append(posts, post)
 	}
 
-	// Ici, vous pourriez ajuster les données pour l'affichage, par exemple encodage d'une image en base64
-	for i, post := range allPosts {
-		if len(post.Photo) > 0 {
-			allPosts[i].Photo = []byte(base64.StdEncoding.EncodeToString(post.Photo))
-		}
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("erreur lors du parcours des posts: %w", err)
 	}
 
-	// Créer la structure de données pour le template
-	data := HomePageData{
-		Posts: allPosts,
-	}
-
-	// Rendre le template HTML
-	renderTemplate(w, "assets/html/AllPosts", data)
+	return posts, nil
 }
 
 func GetCommentsByPost(postID string) ([]mag.Comment, error) {
@@ -403,41 +390,41 @@ func GetCommentsByPost(postID string) ([]mag.Comment, error) {
 }
 
 func InsertLike(postID, userID int, likeType string, sticker []byte) error {
-    db, err := sql.Open("sqlite3", "./db/database.db")
-    if err != nil {
-        return err
-    }
-    defer db.Close()
+	db, err := sql.Open("sqlite3", "./db/database.db")
+	if err != nil {
+		return err
+	}
+	defer db.Close()
 
-    tx, err := db.Begin()
-    if err != nil {
-        return err
-    }
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
 
-    res, err := tx.Exec("INSERT INTO Likes (post_id, user_id, type) VALUES (?, ?, ?)", postID, userID, likeType)
-    if err != nil {
-        tx.Rollback()
-        return err
-    }
+	res, err := tx.Exec("INSERT INTO Likes (post_id, user_id, type) VALUES (?, ?, ?)", postID, userID, likeType)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 
-    likeID, err := res.LastInsertId()
-    if err != nil {
-        tx.Rollback()
-        return err
-    }
+	likeID, err := res.LastInsertId()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 
-    _, err = tx.Exec("INSERT INTO Stickers (like_id, sticker) VALUES (?, ?)", likeID, sticker)
-    if err != nil {
-        tx.Rollback()
-        return err
-    }
+	_, err = tx.Exec("INSERT INTO Stickers (like_id, sticker) VALUES (?, ?)", likeID, sticker)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 
-    err = tx.Commit()
-    if err != nil {
-        return err
-    }
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
 
-    return nil
+	return nil
 }
 
 func AuthenticateUser(mail, password string) (mag.User, error) {
@@ -531,7 +518,10 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	t.Execute(w, data)
+	err = t.Execute(w, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func GetMessagesCrees(userID int) ([]mag.MessagesCree, error) {
@@ -593,27 +583,27 @@ func GetMessagesAimes(userID int) ([]mag.MessagesAime, error) {
 }
 
 func messagesCreesHandler(w http.ResponseWriter, r *http.Request) {
-   
-    userID := 1 
 
-    messagesCrees, err := GetMessagesCrees(userID)
-    if err != nil {
-        http.Error(w, "Erreur lors de la récupération des messages créés: "+err.Error(), http.StatusInternalServerError)
-        return
-    }
+	userID := 1
 
-    renderTemplate(w, "assets/html/MessagesCrees", messagesCrees)
+	messagesCrees, err := GetMessagesCrees(userID)
+	if err != nil {
+		http.Error(w, "Erreur lors de la récupération des messages créés: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	renderTemplate(w, "assets/html/MessagesCrees", messagesCrees)
 }
 
 func messagesAimesHandler(w http.ResponseWriter, r *http.Request) {
-   
-    userID := 1 
 
-    messagesAimes, err := GetMessagesAimes(userID)
-    if err != nil {
-        http.Error(w, "Erreur lors de la récupération des messages aimés: "+err.Error(), http.StatusInternalServerError)
-        return
-    }
+	userID := 1
 
-    renderTemplate(w, "assets/html/MessagesAimes", messagesAimes)
+	messagesAimes, err := GetMessagesAimes(userID)
+	if err != nil {
+		http.Error(w, "Erreur lors de la récupération des messages aimés: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	renderTemplate(w, "assets/html/MessagesAimes", messagesAimes)
 }
