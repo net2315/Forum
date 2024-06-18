@@ -11,7 +11,7 @@ type Post struct {
 	CategorieID int
 	Texte       string
 	DateHeure   string
-	Photo       []byte
+	Photo       string
 	Likes       int
 	Comments    []Comment
 }

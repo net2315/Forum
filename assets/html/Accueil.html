@@ -41,7 +41,7 @@
 
         <div class="allbutton">
             {{range .Categories}}
-            <a href="/posts?id={{.ID}}">{{.Nom}}</a>
+            <a href="/cat-posts?id={{.ID}}">{{.Nom}}</a>
             {{end}}
         </div>
         <button id="messagesCreesButton"><a href="./MessagesCrees.html"></a>Messages Créés</button>
@@ -58,7 +58,7 @@
         <p class="post-category">Publié dans la catégorie : {{.CategorieID}}</p>
         <p class="post-date">Publié le {{.DateHeure}}</p>
         {{if .Photo}}
-        <img src="data:image/jpeg;base64,{{.Photo}}" alt="Photo" class="post-image">
+        <img src="data:image/jpeg;base64,{{.Photo}}" alt="Post Image" class="post-image">
         {{end}}
         <p class="post-comments-title">Commentaires :</p>
         <ul class="comment-list">

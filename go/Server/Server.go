@@ -4,10 +4,13 @@ import (
 	"Forum/go/mag"
 	"database/sql"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"io"
 	"net/http"
 	"text/template"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -28,9 +31,10 @@ func HandleFunc() {
 	http.HandleFunc("/register", Register)
 	http.HandleFunc("/categories", categoriesHandler)
 	http.HandleFunc("/addCategory", AddCategory)
+	http.HandleFunc("/addPost", AddPostHandler)
 	http.HandleFunc("/addComment", AddCommentHandler)
 	http.HandleFunc("/categories-page", categoriesPageHandler)
-	http.HandleFunc("/posts", postsHandler)
+	http.HandleFunc("/cat-posts", postsHandler)
 	http.HandleFunc("/messagesCrees", messagesCreesHandler)
 	http.HandleFunc("/messagesAimes", messagesAimesHandler)
 	http.Handle("/media/", http.StripPrefix("/media/", http.FileServer(http.Dir("./media"))))
@@ -61,13 +65,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		allPosts = append(allPosts, posts...)
-	}
-
-	// Ici, vous pourriez ajuster les données pour l'affichage, par exemple encodage d'une image en base64
-	for i, post := range allPosts {
-		if len(post.Photo) > 0 {
-			allPosts[i].Photo = []byte(base64.StdEncoding.EncodeToString(post.Photo))
-		}
 	}
 
 	// Créer la structure de données pour le template
@@ -109,6 +106,56 @@ func GetCategories() ([]mag.Categorie, error) {
 	data = categories
 
 	return categories, nil
+}
+
+func AddPostHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		categorieID := r.FormValue("categorie_id") // S'assurer que cela correspond au champ "hidden" dans le formulaire HTML
+		texte := r.FormValue("texte")
+		dateHeure := time.Now().Format("2006-01-02 15:04:05")
+
+		file, _, err := r.FormFile("photo")
+		if err != nil && !errors.Is(err, http.ErrMissingFile) { // Permettre des posts sans photo
+			http.Error(w, "Erreur lors du chargement de l'image: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+		var imgData []byte
+		if file != nil {
+			defer file.Close()
+			imgData, err = io.ReadAll(file)
+			if err != nil {
+				http.Error(w, "Erreur lors de la lecture de l'image: "+err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		err = InsertPost(categorieID, texte, dateHeure, imgData)
+		if err != nil {
+			http.Error(w, "Erreur lors de l'ajout du post: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	} else {
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+	}
+}
+
+func InsertPost(categorieID, texte, dateHeure string, photo []byte) error {
+	db, err := sql.Open("sqlite3", "./db/database.db")
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	if photo == nil {
+		// Insertion sans photo
+		_, err = db.Exec("INSERT INTO post (categorie_id, texte, date_heure) VALUES (?, ?, ?)", categorieID, texte, dateHeure)
+	} else {
+		// Insertion avec photo
+		_, err = db.Exec("INSERT INTO post (categorie_id, texte, date_heure, photo) VALUES (?, ?, ?, ?)", categorieID, texte, dateHeure, photo)
+	}
+	return err
 }
 
 func InsertCategory(nom string) error {
@@ -197,16 +244,15 @@ func GetPostsByCategory(categoryID string) ([]mag.Post, error) {
 	var posts []mag.Post
 	for rows.Next() {
 		var post mag.Post
-		if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &post.Photo); err != nil {
+		var photoData []byte
+		if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &photoData); err != nil {
 			return nil, fmt.Errorf("erreur lors du scan des posts: %w", err)
 		}
-
-		// Récupérer les commentaires pour chaque post
-		comments, err := GetCommentsByPost(fmt.Sprint(post.ID))
-		if err != nil {
-			return nil, fmt.Errorf("erreur lors de la récupération des commentaires: %w", err)
+		if len(photoData) > 0 {
+			post.Photo = base64.StdEncoding.EncodeToString(photoData)
 		}
-		post.Comments = comments
+
+		// Ajouter la récupération des commentaires si nécessaire ici
 
 		posts = append(posts, post)
 	}
@@ -238,7 +284,7 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Redirect to the post page
-		http.Redirect(w, r, fmt.Sprintf("/posts?id=%s", postID), http.StatusSeeOther)
+		http.Redirect(w, r, fmt.Sprintf("/cat-posts?id=%s", postID), http.StatusSeeOther)
 	} else {
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 	}
@@ -301,11 +347,7 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for i, post := range posts {
-		if len(post.Photo) > 0 {
-			posts[i].Photo = []byte(base64.StdEncoding.EncodeToString(post.Photo))
-		}
-	}
+	// Les posts sont déjà préparés avec les photos encodées en base64, donc pas besoin de modifier
 
 	data := struct {
 		Categorie mag.Categorie
@@ -315,7 +357,7 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		Posts:     posts,
 	}
 
-	renderTemplate(w, "assets/html/Posts", data)
+	renderTemplate(w, "assets/html/Cat-Posts", data)
 }
 
 func GetPosts() ([]mag.Post, error) {

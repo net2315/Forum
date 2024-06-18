@@ -54,14 +54,14 @@
 <p>Aucun post dans cette catégorie.</p>
 {{end}}
 
-<h2>Ajouter un Post</h2>
 <form action="/addPost" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="category_id" value="{{.Categorie.ID}}">
+    <input type="hidden" name="categorie_id" value="{{.Categorie.ID}}"> <!-- Corrigé de category_id à categorie_id -->
     <label for="texte">Texte :</label><br>
     <textarea id="texte" name="texte" rows="4" cols="50"></textarea><br>
     <label for="photo">Photo :</label><br>
     <input type="file" id="photo" name="photo"><br>
     <input type="submit" value="Ajouter">
 </form>
+
 </body>
 </html>
