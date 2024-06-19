@@ -52,7 +52,7 @@
     {{range .Posts}}
     <li class="post">
         <h2 class="post-title">{{.Texte}}</h2>
-        <p class="post-category">Publié dans la catégorie : {{.CategorieID}}</p>
+        <p class="post-category">{{.CategorieNom}}</p>
         <p class="post-date">Publié le {{.DateHeure}}</p>
         {{if .Photo}}
         <img src="data:image/jpeg;base64,{{.Photo}}" alt="Post Image" class="post-image">

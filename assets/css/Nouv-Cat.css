@@ -67,3 +67,20 @@ a {
     justify-content: flex-start;
     align-items: center;
 }
+
+.formulaire {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.titre {
+    font-family: "Bell MT", serif;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+}

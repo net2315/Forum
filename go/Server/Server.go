@@ -262,7 +262,13 @@ func GetPostsByCategory(categoryID string) ([]mag.Post, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, categorie_id, texte, date_heure, photo FROM post WHERE categorie_id = ?", categoryID)
+	query := `
+    SELECT p.id, p.categorie_id, c.nom, p.texte, p.date_heure, p.photo
+    FROM post p
+    JOIN categorie c ON p.categorie_id = c.id
+    WHERE p.categorie_id = ?
+    `
+	rows, err := db.Query(query, categoryID)
 	if err != nil {
 		return nil, fmt.Errorf("erreur lors de la récupération des posts: %w", err)
 	}
@@ -272,15 +278,10 @@ func GetPostsByCategory(categoryID string) ([]mag.Post, error) {
 	for rows.Next() {
 		var post mag.Post
 		var photoData []byte
-		if err := rows.Scan(&post.ID, &post.CategorieID, &post.Texte, &post.DateHeure, &photoData); err != nil {
+		if err := rows.Scan(&post.ID, &post.CategorieID, &post.CategorieNom, &post.Texte, &post.DateHeure, &photoData); err != nil {
 			return nil, fmt.Errorf("erreur lors du scan des posts: %w", err)
 		}
-		if len(photoData) > 0 {
-			post.Photo = base64.StdEncoding.EncodeToString(photoData)
-		}
-
-		// Ajouter la récupération des commentaires si nécessaire ici
-
+		post.Photo = base64.StdEncoding.EncodeToString(photoData)
 		posts = append(posts, post)
 	}
 

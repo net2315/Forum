@@ -31,15 +31,18 @@
     </div>
     <hr>
 </div>
-<h1>Ajouter une Nouvelle Catégorie</h1>
-<form action="/addCategory" method="POST">
-    <label for="nom">Nom de la Catégorie:</label>
-    <input type="text" id="nom" name="nom" required><br><br>
+<div class="formulaire">
+    <h1 class="titre">Ajouter une Nouvelle Catégorie</h1>
+    <br>
+    <form action="/addCategory" method="POST">
+        <label for="nom">Nom de la Catégorie:</label>
+        <input type="text" id="nom" name="nom" required><br><br>
 
-    <label for="description">Description:</label>
-    <textarea id="description" name="description" required></textarea><br><br>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea><br><br>
 
-    <input type="submit" value="Ajouter Catégorie">
-</form>
+        <input type="submit" value="Ajouter Catégorie">
+    </form>
+</div>
 </body>
 </html>

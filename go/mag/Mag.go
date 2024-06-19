@@ -1,5 +1,7 @@
 package mag
 
+import "time"
+
 type Categorie struct {
 	ID          int
 	Nom         string
@@ -7,20 +9,21 @@ type Categorie struct {
 }
 
 type Post struct {
-	ID          int
-	CategorieID int
-	Texte       string
-	DateHeure   string
-	Photo       string
-	Likes       int
-	Comments    []Comment
+	ID           int
+	CategorieID  int
+	CategorieNom string
+	Texte        string
+	DateHeure    time.Time
+	Photo        string
+	Likes        int
+	Comments     []Comment
 }
 
 type Comment struct {
 	ID        int
 	UserID    int
 	Texte     string
-	DateHeure string
+	DateHeure time.Time
 	Likes     int
 	PostID    int
 }
