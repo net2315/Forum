@@ -29,6 +29,7 @@ func HandleFunc() {
 	http.HandleFunc("/login", Login)
 	http.HandleFunc("/register", Register)
 	http.HandleFunc("/categories", categoriesHandler)
+	http.HandleFunc("/nouv_cat", Nouv_Cat)
 	http.HandleFunc("/addCategory", AddCategory)
 	http.HandleFunc("/nouv_post", Nouv_Post)
 	http.HandleFunc("/addPost", AddPostHandler)
@@ -88,6 +89,20 @@ func Nouv_Post(w http.ResponseWriter, r *http.Request) {
 	}
 
 	renderTemplate(w, "assets/html/Nouv-Post", data)
+}
+
+func Nouv_Cat(w http.ResponseWriter, r *http.Request) {
+	categories, err := GetCategories()
+	if err != nil {
+		http.Error(w, "Erreur lors de la récupération des catégories: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := HomePageData{
+		Categories: categories,
+	}
+
+	renderTemplate(w, "assets/html/Nouv-Cat", data)
 }
 
 func GetCategories() ([]mag.Categorie, error) {
@@ -166,32 +181,36 @@ func InsertPost(categorieID, texte string, dateHeure time.Time, photo []byte) er
 	return err
 }
 
-func InsertCategory(nom string) error {
+func InsertCategory(nom, description string) error {
 	db, err := sql.Open("sqlite3", "./db/database.db")
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO categorie (nom) VALUES (?)", nom)
+	_, err = db.Exec("INSERT INTO categorie (nom, description) VALUES (?, ?)", nom, description)
 	return err
 }
 
 func AddCategory(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		nom := r.FormValue("nom")
+		description := r.FormValue("description")
+
 		if nom == "" {
 			http.Error(w, "Le nom de la catégorie est requis", http.StatusBadRequest)
 			return
 		}
 
-		err := InsertCategory(nom)
+		err := InsertCategory(nom, description)
 		if err != nil {
-			http.Error(w, "Erreur lors de l'ajout de la catégorie", http.StatusInternalServerError)
+			http.Error(w, "Erreur lors de l'ajout de la catégorie: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/categories-page", http.StatusSeeOther)
+	} else {
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 	}
 }
 
