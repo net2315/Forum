@@ -27,7 +27,7 @@ a {
     display: flex;
 }
 
-.allbutton > a{
+.allbutton > a {
     border: 2px solid #85f6c3;
     border-radius: 5px;
     padding: 6px 6px;
@@ -120,6 +120,9 @@ p {
     max-width: 800px;
     border-radius: 10px;
     transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .post:hover {
@@ -127,8 +130,12 @@ p {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
+.post-title {
+    font-family: "Bell MT", serif;
+}
+
 .post img {
-    max-width: 100%;
+    max-width: 50%;
     border-radius: 10px;
 }
 
@@ -139,7 +146,7 @@ p {
 }
 
 .post-list {
-    list-style-type: none; /* Retire les puces */
+    list-style-type: none;
     padding-left: 0;
     display: flex;
     flex-wrap: wrap;
@@ -148,4 +155,9 @@ p {
 
 .comment-list {
     list-style-type: none;
+}
+
+.post-category {
+    font-family: Baloo, serif;
+    color: #008b31;
 }
