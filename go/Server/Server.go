@@ -4,7 +4,6 @@ import (
 	"Forum/go/mag"
 	"database/sql"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"io"
@@ -31,6 +30,7 @@ func HandleFunc() {
 	http.HandleFunc("/register", Register)
 	http.HandleFunc("/categories", categoriesHandler)
 	http.HandleFunc("/addCategory", AddCategory)
+	http.HandleFunc("/nouv_post", Nouv_Post)
 	http.HandleFunc("/addPost", AddPostHandler)
 	http.HandleFunc("/addComment", AddCommentHandler)
 	http.HandleFunc("/categories-page", categoriesPageHandler)
@@ -76,6 +76,20 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "assets/html/Accueil", data)
 }
 
+func Nouv_Post(w http.ResponseWriter, r *http.Request) {
+	categories, err := GetCategories()
+	if err != nil {
+		http.Error(w, "Erreur lors de la récupération des catégories: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := HomePageData{
+		Categories: categories,
+	}
+
+	renderTemplate(w, "assets/html/Nouv-Post", data)
+}
+
 func GetCategories() ([]mag.Categorie, error) {
 	//Open database
 	db, err := sql.Open("sqlite3", "./db/database.db")
@@ -110,17 +124,13 @@ func GetCategories() ([]mag.Categorie, error) {
 
 func AddPostHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		categorieID := r.FormValue("categorie_id") // S'assurer que cela correspond au champ "hidden" dans le formulaire HTML
+		categorieID := r.FormValue("categorie_id")
 		texte := r.FormValue("texte")
-		dateHeure := time.Now().Format("2006-01-02 15:04:05")
+		dateHeure := time.Now()
 
 		file, _, err := r.FormFile("photo")
-		if err != nil && !errors.Is(err, http.ErrMissingFile) { // Permettre des posts sans photo
-			http.Error(w, "Erreur lors du chargement de l'image: "+err.Error(), http.StatusBadRequest)
-			return
-		}
 		var imgData []byte
-		if file != nil {
+		if err == nil && file != nil {
 			defer file.Close()
 			imgData, err = io.ReadAll(file)
 			if err != nil {
@@ -141,20 +151,18 @@ func AddPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func InsertPost(categorieID, texte, dateHeure string, photo []byte) error {
+func InsertPost(categorieID, texte string, dateHeure time.Time, photo []byte) error {
 	db, err := sql.Open("sqlite3", "./db/database.db")
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	if photo == nil {
-		// Insertion sans photo
-		_, err = db.Exec("INSERT INTO post (categorie_id, texte, date_heure) VALUES (?, ?, ?)", categorieID, texte, dateHeure)
-	} else {
-		// Insertion avec photo
-		_, err = db.Exec("INSERT INTO post (categorie_id, texte, date_heure, photo) VALUES (?, ?, ?, ?)", categorieID, texte, dateHeure, photo)
+	stmt, err := db.Prepare("INSERT INTO post (categorie_id, texte, date_heure, photo) VALUES (?, ?, ?, ?)")
+	if err != nil {
+		return err
 	}
+	_, err = stmt.Exec(categorieID, texte, dateHeure, photo)
 	return err
 }
 
