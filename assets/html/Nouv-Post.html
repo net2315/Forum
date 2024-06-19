@@ -31,23 +31,24 @@
     </div>
     <hr>
 </div>
+<div class="formulaire">
+    <h1 class="titre">Ajouter un Nouveau Post</h1>
+    <form action="/addPost" method="POST" enctype="multipart/form-data">
+        <label for="categorie">Catégorie:</label>
+        <select name="categorie_id" id="categorie">
+            {{range .Categories}}
+            <option value="{{.ID}}">{{.Nom}}</option>
+            {{end}}
+        </select><br>
 
-<h1>Ajouter un Nouveau Post</h1>
-<form action="/addPost" method="POST" enctype="multipart/form-data">
-    <label for="categorie">Catégorie:</label>
-    <select name="categorie_id" id="categorie">
-        {{range .Categories}}
-        <option value="{{.ID}}">{{.Nom}}</option>
-        {{end}}
-    </select><br><br>
+        <label for="texte">Titre:</label>
+        <textarea id="texte" name="texte" required></textarea><br><br>
 
-    <label for="texte">Texte:</label>
-    <textarea id="texte" name="texte" required></textarea><br><br>
+        <label for="photo">Photo:</label>
+        <input type="file" id="photo" name="photo"><br><br>
 
-    <label for="photo">Photo:</label>
-    <input type="file" id="photo" name="photo"><br><br>
-
-    <input type="submit" value="Ajouter Post">
-</form>
+        <input type="submit" value="Ajouter Post" class="envoi">
+    </form>
+</div>
 </body>
 </html>
