@@ -11,28 +11,7 @@ html, body {
     background-attachment: fixed;
 }
 
-button {
-    cursor: pointer;
-}
-
-article {
-    display: flex;
-}
-
 a {
-    text-decoration: none;
-}
-
-.allbutton {
-    display: flex;
-}
-
-.allbutton > a {
-    border: 2px solid #85f6c3;
-    border-radius: 5px;
-    padding: 6px 6px;
-    margin: 5px;
-    background-color: #85f6c3;
     text-decoration: none;
 }
 
@@ -43,7 +22,6 @@ a {
     padding: 5px;
     z-index: 1000;
     margin: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .title {
@@ -81,6 +59,10 @@ a {
     margin: 8px;
 }
 
+.titre {
+    font-family: "Bell MT", serif;
+}
+
 .pageTitle {
     font-size: 50px;
     color: rgb(48, 173, 16);
@@ -90,20 +72,14 @@ a {
     align-items: center;
 }
 
-.ButtonContainer {
-    display: flex;
-    justify-content: left;
-    align-items: center;
-}
 
-.ButtonContainer > button {
-    background-color: rgb(48, 173, 16);
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 15px;
-    border-radius: 30px;
-    margin: 8px;
+.tout {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 p {
@@ -162,3 +138,4 @@ p {
     font-family: Baloo, serif;
     color: #008b31;
 }
+

@@ -41,10 +41,6 @@
             <a href="/cat-posts?id={{.ID}}">{{.Nom}}</a>
             {{end}}
         </div>
-        <button id="messagesCreesButton"><a href="./MessagesCrees.html"></a>Messages Créés</button>
-
-
-        <button id="messagesAimesButton"><a href="./MessagesAimes.html"></a>Messages Aimés</button>
     </div>
 
 </div>
@@ -53,7 +49,7 @@
     <li class="post">
         <h2 class="post-title">{{.Texte}}</h2>
         <p class="post-category">{{.CategorieNom}}</p>
-        <p class="post-date">Publié le {{.DateHeure}}</p>
+        <p class="post-date">Publié le: {{.DateHeure}}</p>
         {{if .Photo}}
         <img src="data:image/jpeg;base64,{{.Photo}}" alt="Post Image" class="post-image">
         {{end}}
